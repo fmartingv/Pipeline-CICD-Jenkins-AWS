@@ -1,9 +1,8 @@
-prometheus:
-    image: prom/prometheus:latest
-    ports:
-        - "9090:9090"
-    volumes:
-        - /etc/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
-        - prometheus_data:/prometheus
-    networks:
-        - app-network
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
