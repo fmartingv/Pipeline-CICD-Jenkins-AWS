@@ -6,8 +6,6 @@ const prometheus = require('prom-client');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-let isServerReady = false;
-
 // Path to the JSON file
 const playersFilePath = path.join(__dirname, 'players.json');
 
@@ -68,7 +66,7 @@ app.delete('/players/:id', async (req, res) => {
     }
 });
 
-// Metrics and health
+// Metrics 
 const collectDefaultMetrics = prometheus.collectDefaultMetrics;
 collectDefaultMetrics();
 
@@ -76,21 +74,6 @@ app.get('/metrics', async (req, res) => {
     res.set('Content-Type', prometheus.register.contentType);
     const metrics = await prometheus.register.metrics();
     res.send(metrics);
-});
-
-app.get('/health', (req, res) => {
-    if (isServerReady) {
-        res.status(200).json({ 
-            status: 'OK', 
-            uptime: process.uptime(),
-            timestamp: new Date().toISOString()
-        });
-    } else {
-        res.status(503).json({ 
-            status: 'Server Initializing',
-            timestamp: new Date().toISOString()
-        });
-    }
 });
 
 // Server control
@@ -102,16 +85,11 @@ module.exports = {
         return new Promise((resolve, reject) => {
             server = app.listen(PORT, '0.0.0.0', () => {
                 console.log(`Server started on http://localhost:${PORT}`);
-                
-                // Simulate initialization or additional checks
-                isServerReady = true;
-                console.log('Server fully initialized');
                 resolve(server);
             });
 
             server.on('error', (err) => {
                 console.error('Error starting server:', err);
-                isServerReady = false;
                 reject(err);
             });
         });
@@ -124,7 +102,6 @@ module.exports = {
                         return reject(err);
                     }
                     console.log('Server stopped');
-                    isServerReady = false;
                     resolve();
                 });
             } else {
