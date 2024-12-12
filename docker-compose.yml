@@ -1,5 +1,4 @@
 version: '3.8'
-
 services:
   app:
     build:
@@ -19,7 +18,7 @@ services:
     ports:
       - "9090:9090"
     volumes:
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
       - prometheus_data:/prometheus
     networks:
       - app-network

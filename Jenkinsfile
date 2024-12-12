@@ -8,7 +8,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                checkout scm
+                git 'https://github.com/fmartingv/Final_Automatizaci-n'
             }
         }
         
