@@ -17,3 +17,5 @@ services:
 
 volumes:
   jenkins_home:
+  - ~/Escritorio/ManuelFinal:/usr/src/app
+  - /var/jenkins_home/workspace:/var/jenkins_home/workspace
