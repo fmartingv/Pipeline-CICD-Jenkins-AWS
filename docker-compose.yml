@@ -6,8 +6,6 @@ services:
       dockerfile: Dockerfile
     ports:
       - "3000:3000"
-    volumes:
-      - ./players.json:/usr/src/app/players.json
     networks:
       - app-network
 
