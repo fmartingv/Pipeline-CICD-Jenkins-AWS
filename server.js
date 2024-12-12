@@ -91,8 +91,8 @@ if (require.main === module) {
 module.exports = {
     app,
     start: () => {
-        server = app.listen(PORT, () => {
-            console.log(`Servidor iniciado en http://localhost:${PORT}`);
+        server = app.listen(3000, '0.0.0.0', () => {
+            console.log('Servidor iniciado en http://localhost:3000');
         });
         return server;
     },
