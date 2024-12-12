@@ -1,11 +1,9 @@
 prometheus:
-  image: prom/prometheus:latest
-  ports:
-    - "9090:9090"
-  volumes:
-    - type: bind
-      source: ./prometheus.yml
-      target: /etc/prometheus/prometheus.yml
-    - prometheus_data:/prometheus
-  networks:
-    - app-network
+    image: prom/prometheus:latest
+    ports:
+        - "9090:9090"
+    volumes:
+        - /etc/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+        - prometheus_data:/prometheus
+    networks:
+        - app-network
