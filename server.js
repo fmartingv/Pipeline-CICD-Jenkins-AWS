@@ -1,5 +1,5 @@
 const express = require('express');
-const fs = require('fs');
+const fs = require('fs').promises;  // Use promise-based fs
 const path = require('path');
 const prometheus = require('prom-client');
 
@@ -8,33 +8,32 @@ const PORT = process.env.PORT || 3000;
 
 let isServerReady = false;
 
-// Ruta del archivo JSON
+// Path to the JSON file
 const playersFilePath = path.join(__dirname, 'players.json');
 
-// Middleware para analizar JSON en las solicitudes
+// Middleware to parse JSON in requests
 app.use(express.json());
 
-// Servir archivos estáticos
+// Serve static files
 app.use(express.static('public'));
 
-// Obtener la lista de jugadores
-app.get('/players', (req, res) => {
-    fs.readFile(playersFilePath, 'utf8', (err, data) => {
-        if (err) {
-            console.error('Error leyendo el archivo:', err);
-            return res.status(500).send('Error leyendo el archivo');
-        }
-        res.send(JSON.parse(data));
-    });
+// Get the list of players
+app.get('/players', async (req, res) => {
+    try {
+        const data = await fs.readFile(playersFilePath, 'utf8');
+        res.json(JSON.parse(data));
+    } catch (err) {
+        console.error('Error reading file:', err);
+        res.status(500).json({ error: 'Error reading file' });
+    }
 });
 
-// Añadir o actualizar un jugador
-app.post('/players', (req, res) => {
+// Add or update a player
+app.post('/players', async (req, res) => {
     const newPlayer = req.body;
 
-    fs.readFile(playersFilePath, 'utf8', (err, data) => {
-        if (err) return res.status(500).json({ error: 'Error leyendo el archivo' });
-
+    try {
+        const data = await fs.readFile(playersFilePath, 'utf8');
         let playersData = JSON.parse(data);
         const existingPlayerIndex = playersData.players.findIndex(p => p.id === newPlayer.id);
 
@@ -44,31 +43,32 @@ app.post('/players', (req, res) => {
             playersData.players.push(newPlayer);
         }
 
-        fs.writeFile(playersFilePath, JSON.stringify(playersData, null, 2), (err) => {
-            if (err) return res.status(500).json({ error: 'Error escribiendo archivo' });
-            res.status(201).json({ success: true, player: newPlayer });
-        });
-    });
+        await fs.writeFile(playersFilePath, JSON.stringify(playersData, null, 2));
+        res.status(201).json({ success: true, player: newPlayer });
+    } catch (err) {
+        console.error('Error processing player:', err);
+        res.status(500).json({ error: 'Error writing file' });
+    }
 });
 
-// Eliminar un jugador
-app.delete('/players/:id', (req, res) => {
+// Delete a player
+app.delete('/players/:id', async (req, res) => {
     const playerId = parseInt(req.params.id);
 
-    fs.readFile(playersFilePath, 'utf8', (err, data) => {
-        if (err) return res.status(500).json({ error: 'Error leyendo el archivo' });
-
+    try {
+        const data = await fs.readFile(playersFilePath, 'utf8');
         let playersData = JSON.parse(data);
         playersData.players = playersData.players.filter(p => p.id !== playerId);
 
-        fs.writeFile(playersFilePath, JSON.stringify(playersData, null, 2), (err) => {
-            if (err) return res.status(500).json({ error: 'Error escribiendo archivo' });
-            res.json({ success: true });
-        });
-    });
+        await fs.writeFile(playersFilePath, JSON.stringify(playersData, null, 2));
+        res.json({ success: true });
+    } catch (err) {
+        console.error('Error deleting player:', err);
+        res.status(500).json({ error: 'Error writing file' });
+    }
 });
 
-// Métricas y salud
+// Metrics and health
 const collectDefaultMetrics = prometheus.collectDefaultMetrics;
 collectDefaultMetrics();
 
@@ -93,7 +93,7 @@ app.get('/health', (req, res) => {
     }
 });
 
-// Control del servidor
+// Server control
 let server;
 
 module.exports = {
@@ -101,18 +101,16 @@ module.exports = {
     start: () => {
         return new Promise((resolve, reject) => {
             server = app.listen(PORT, '0.0.0.0', () => {
-                console.log(`Servidor iniciado en http://localhost:${PORT}`);
+                console.log(`Server started on http://localhost:${PORT}`);
                 
-                // Simular tiempo de inicialización o verificaciones adicionales
-                setTimeout(() => {
-                    isServerReady = true;
-                    console.log('Servidor completamente inicializado');
-                    resolve(server);
-                }, 5000);  // Esperar 5 segundos antes de marcar como completamente listo
+                // Simulate initialization or additional checks
+                isServerReady = true;
+                console.log('Server fully initialized');
+                resolve(server);
             });
 
             server.on('error', (err) => {
-                console.error('Error iniciando el servidor:', err);
+                console.error('Error starting server:', err);
                 isServerReady = false;
                 reject(err);
             });
@@ -125,7 +123,7 @@ module.exports = {
                     if (err) {
                         return reject(err);
                     }
-                    console.log('Servidor detenido');
+                    console.log('Server stopped');
                     isServerReady = false;
                     resolve();
                 });
@@ -136,7 +134,7 @@ module.exports = {
     },
 };
 
-// Iniciar servidor si se ejecuta directamente
+// Start server if run directly
 if (require.main === module) {
     module.exports.start().catch(console.error);
 }
