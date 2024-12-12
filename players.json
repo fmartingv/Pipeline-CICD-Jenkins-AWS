@@ -89,6 +89,24 @@
         "physical": 78,
         "overall": 90
       }
+    },
+    {
+      "id": 1734015375706,
+      "name": "dfghzb",
+      "position": "Delantero",
+      "number": 45,
+      "team": "dfgz",
+      "age": 45,
+      "nationality": "fzgdh",
+      "attributes": {
+        "pace": 34,
+        "shooting": 34,
+        "passing": 43,
+        "dribbling": 43,
+        "defending": 34,
+        "physical": 34,
+        "overall": 37
+      }
     }
   ]
 }
