@@ -6,6 +6,8 @@ const prometheus = require('prom-client');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+let isServerReady = false;
+
 // Ruta del archivo JSON
 const playersFilePath = path.join(__dirname, 'players.json');
 
@@ -77,24 +79,44 @@ app.get('/metrics', async (req, res) => {
 });
 
 app.get('/health', (req, res) => {
-    res.status(200).json({ status: 'OK' });
+    if (isServerReady) {
+        res.status(200).json({ 
+            status: 'OK', 
+            uptime: process.uptime(),
+            timestamp: new Date().toISOString()
+        });
+    } else {
+        res.status(503).json({ 
+            status: 'Server Initializing',
+            timestamp: new Date().toISOString()
+        });
+    }
 });
 
 // Control del servidor
 let server;
-if (require.main === module) {
-    server = app.listen(PORT, () => {
-        console.log(`Servidor corriendo en http://localhost:${PORT}`);
-    });
-}
 
 module.exports = {
     app,
     start: () => {
-        server = app.listen(3000, '0.0.0.0', () => {
-            console.log('Servidor iniciado en http://localhost:3000');
+        return new Promise((resolve, reject) => {
+            server = app.listen(PORT, '0.0.0.0', () => {
+                console.log(`Servidor iniciado en http://localhost:${PORT}`);
+                
+                // Simular tiempo de inicialización o verificaciones adicionales
+                setTimeout(() => {
+                    isServerReady = true;
+                    console.log('Servidor completamente inicializado');
+                    resolve(server);
+                }, 5000);  // Esperar 5 segundos antes de marcar como completamente listo
+            });
+
+            server.on('error', (err) => {
+                console.error('Error iniciando el servidor:', err);
+                isServerReady = false;
+                reject(err);
+            });
         });
-        return server;
     },
     stop: () => {
         return new Promise((resolve, reject) => {
@@ -104,6 +126,7 @@ module.exports = {
                         return reject(err);
                     }
                     console.log('Servidor detenido');
+                    isServerReady = false;
                     resolve();
                 });
             } else {
@@ -112,3 +135,8 @@ module.exports = {
         });
     },
 };
+
+// Iniciar servidor si se ejecuta directamente
+if (require.main === module) {
+    module.exports.start().catch(console.error);
+}
