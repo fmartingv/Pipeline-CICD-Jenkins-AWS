@@ -3,8 +3,12 @@
   "version": "1.0.0",
   "main": "script.js",
   "scripts": {
+    "start": "node server.js",
+    "start:pm2": "pm2 start ecosystem.config.js",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "test": "jest",
-    "start": "node server.js"
+    "test:coverage": "jest --coverage"
   },
   "keywords": [],
   "author": "",
@@ -18,4 +22,5 @@
     "jest": "^27.5.1",
     "supertest": "^6.3.4"
   }
+  
 }
