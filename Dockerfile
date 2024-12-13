@@ -1,8 +1,9 @@
 FROM node:16
 WORKDIR /usr/src/app
+RUN npm install -g pm2
 COPY package*.json ./
 RUN npm install
-RUN npm install pm2 -g
 COPY . .
+COPY ecosystem.config.js ./
 EXPOSE 3000
-CMD ["pm2-runtime", "server.js"]
+CMD ["pm2-runtime", "start", "ecosystem.config.js", "--env", "production"]
