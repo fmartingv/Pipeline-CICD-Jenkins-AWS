@@ -15,13 +15,19 @@ app.use(express.json());
 // Serve static files
 app.use(express.static('public'));
 
+// Log request helper
+const logRequest = (req, message) => {
+    console.log(`[${new Date().toISOString()}] ${req.method} ${req.path} - ${message}`);
+};
+
 // Get the list of players
 app.get('/players', async (req, res) => {
     try {
         const data = await fs.readFile(playersFilePath, 'utf8');
+        logRequest(req, 'Lista de jugadores solicitada');
         res.json(JSON.parse(data));
     } catch (err) {
-        console.error('Error reading file:', err);
+        logRequest(req, `Error: ${err.message}`);
         res.status(500).json({ error: 'Error reading file' });
     }
 });
@@ -29,22 +35,23 @@ app.get('/players', async (req, res) => {
 // Add or update a player
 app.post('/players', async (req, res) => {
     const newPlayer = req.body;
-
     try {
         const data = await fs.readFile(playersFilePath, 'utf8');
         let playersData = JSON.parse(data);
         const existingPlayerIndex = playersData.players.findIndex(p => p.id === newPlayer.id);
 
         if (existingPlayerIndex !== -1) {
+            logRequest(req, `Jugador actualizado: ${JSON.stringify(newPlayer)}`);
             playersData.players[existingPlayerIndex] = newPlayer;
         } else {
+            logRequest(req, `Nuevo jugador añadido: ${JSON.stringify(newPlayer)}`);
             playersData.players.push(newPlayer);
         }
 
         await fs.writeFile(playersFilePath, JSON.stringify(playersData, null, 2));
         res.status(201).json({ success: true, player: newPlayer });
     } catch (err) {
-        console.error('Error processing player:', err);
+        logRequest(req, `Error: ${err.message}`);
         res.status(500).json({ error: 'Error writing file' });
     }
 });
@@ -52,16 +59,16 @@ app.post('/players', async (req, res) => {
 // Delete a player
 app.delete('/players/:id', async (req, res) => {
     const playerId = parseInt(req.params.id);
-
     try {
         const data = await fs.readFile(playersFilePath, 'utf8');
         let playersData = JSON.parse(data);
+        const playerToDelete = playersData.players.find(p => p.id === playerId);
         playersData.players = playersData.players.filter(p => p.id !== playerId);
-
         await fs.writeFile(playersFilePath, JSON.stringify(playersData, null, 2));
+        logRequest(req, `Jugador eliminado: ${JSON.stringify(playerToDelete)}`);
         res.json({ success: true });
     } catch (err) {
-        console.error('Error deleting player:', err);
+        logRequest(req, `Error: ${err.message}`);
         res.status(500).json({ error: 'Error writing file' });
     }
 });
