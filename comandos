@@ -1,0 +1,24 @@
+docker-compose -f jenkins-compose.yml start
+docker-compose -f jenkins-compose.yml stop
+
+
+
+docker exec -it xxx sh
+cat /var/jenkins_home/secrets/initialAdminPassword
+
+
+
+# pm2-start.sh (New file for separate PM2 monitoring)
+#!/bin/bash
+# Install PM2 globally if not installed
+npm install -g pm2
+
+# Start the application with PM2
+pm2 start ecosystem.config.js
+
+# Save PM2 process list and configure to start on system boot
+pm2 save
+pm2 startup
+
+# Monitor logs continuously
+pm2 logs --raw

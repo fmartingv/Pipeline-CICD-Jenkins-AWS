@@ -34,6 +34,7 @@ app.get('/players', async (req, res) => {
 
 // Add or update a player
 app.post('/players', async (req, res) => {
+    console.log('Recibida petición POST /players');
     const newPlayer = req.body;
     try {
         const data = await fs.readFile(playersFilePath, 'utf8');
