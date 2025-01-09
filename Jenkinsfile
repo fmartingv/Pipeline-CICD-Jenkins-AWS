@@ -1,13 +1,7 @@
 pipeline {
-    agent {
-        docker {
-            image 'node:latest'
-            args '-v /var/run/docker.sock:/var/run/docker.sock -v /usr/local/bin/docker-compose:/usr/local/bin/docker-compose'
-        }
-    }
+    agent any
     environment {
-        DOCKER_COMPOSE = 'docker-compose'
-        DOCKER_COMPOSE_FILE = 'docker-compose.yml'
+        DOCKER_COMPOSE_FILE = 'docker-compose.yml'  
     }
     stages {
         stage('Checkout') {
@@ -37,12 +31,10 @@ pipeline {
         stage('Deploy') {
             steps {
                 script {
-                    // Stop and remove existing containers
-                    sh 'docker-compose -f ${DOCKER_COMPOSE_FILE} down || true'
-                    // Deploy new containers
-                    sh 'docker-compose -f ${DOCKER_COMPOSE_FILE} up -d --build'
-                    // Verify deployment
-                    sh 'docker-compose -f ${DOCKER_COMPOSE_FILE} ps'
+                    // Despliega usando solo el docker-compose del proyecto
+                    sh 'docker-compose up -d --build'
+                    // Verificar despliegue
+                    sh 'docker-compose ps'
                 }
             }
         }
@@ -54,8 +46,8 @@ pipeline {
         failure {
             echo 'Pipeline falló'
             script {
-                sh 'docker-compose -f ${DOCKER_COMPOSE_FILE} logs'
-                sh 'docker-compose -f ${DOCKER_COMPOSE_FILE} down'
+                sh 'docker-compose logs'
+                sh 'docker-compose down'
             }
         }
         always {
