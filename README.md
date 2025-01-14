@@ -50,6 +50,7 @@ Crearemos una instancia m2.medium porqu ela t2.micro puede que se nos quede cort
 
 
 #### Jenkins Docker Compose
+Con esto podremos ejecutar jenkins en nuestro ec2
 ```yaml
 version: '3.8'
 services:
@@ -74,6 +75,7 @@ services:
 ### 3. Configuración del Pipeline
 
 #### Jenkinsfile
+Este será el código de nuestro pipeline.
 ```groovy
 pipeline {
     agent any
@@ -135,6 +137,7 @@ pipeline {
 ### 4. Sistema de Monitorización
 
 #### Script de Monitorización (monitor.sh)
+De esta manera una vez este en funcionamiento la app acada 15 segundos nos llegara información sobre nuestar app
 ```bash
 #!/bin/bash
 CONTAINER_NAME="pipeline_app_1"
@@ -165,7 +168,6 @@ done
 ## 📈 Gestión del Proyecto
 - **Miro**: Utilizado para el diseño y planificación del proyecto, incluyendo diferentes iteraciones del diseño.
 - **Trello**: Gestión de tareas e historias de usuario, incluyendo:
-  - Seguimiento de tests
   - Organización de tareas
   - Historias de usuario
 
