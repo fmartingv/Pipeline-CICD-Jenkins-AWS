@@ -1,48 +1,167 @@
-# Documentación 
+# 📚 Documentación Técnica Completa
 
-## 📋 Descripción
-Aplicación CRUD que permite gestionar una lista de jugadores de fútbol. La aplicación está desplegada en AWS y utiliza Jenkins para la integración continua y despliegue continuo (CI/CD).
+## 📋 Descripción General del Proyecto
+Esta aplicación es una solución CRUD (Create, Read, Update, Delete) diseñada específicamente para la gestión de jugadores de fútbol. El sistema está completamente desplegado en la infraestructura de Amazon Web Services (AWS) y utiliza Jenkins como herramienta principal para implementar prácticas modernas de integración continua y despliegue continuo (CI/CD).
 
-## 🛠️ Tecnologías Utilizadas
-- Frontend: HTML, CSS, JavaScript, NodeJS
-- Base de datos: JSON
-- Contenedorización: Docker
-- CI/CD: Jenkins
-- Cloud: AWS EC2
-- Monitorización: PM2
-- Gestión de proyecto: Miro, Trello
+## 🛠️ Stack Tecnológico Detallado
 
-## 🚀 Configuración y Despliegue
+### Frontend
+- **HTML**: Estructura semántica moderna
+- **CSS**: Estilos responsivos y adaptables
+- **JavaScript**: Interactividad del lado del cliente
+- **Node.js**: Runtime de JavaScript para el servidor
+- **Express.js**: Framework web para Node.js
 
-### Pasos para el Despliegue
+### Almacenamiento de Datos
+- **JSON**: Almacenamiento de datos ligero y flexible
+- Sistema de persistencia mediante archivos JSON
 
-1. **Configuración de AWS EC2**
-   - Crear una instancia EC2 t2.medium
-   - Configurar los grupos de seguridad para permitir tráfico HTTP
-   - Conectar a la instancia vía SSH
+### Containerización y Orquestación
+- **Docker**: Containerización de la aplicación
+- Gestión de contenedores mediante Docker Compose
 
-2. **Configuración de Jenkins**
-   - Utilizar el archivo `jenkins-compose.yml` proporcionado en el repositorio
-   - Instalar los plugins necesarios:
-     - Docker Pipeline
-     - Docker
+### Integración Continua y Despliegue
+- **Jenkins**: Automatización de CI/CD
+- Pipeline configurado para despliegues automáticos
+- Integración con GitHub para control de versiones
 
-3. **Configuración del Pipeline**
-   - Crear un nuevo pipeline en Jenkins
-   - Configurar las credenciales de GitHub
-   - Utilizar el Jenkinsfile del repositorio que incluye:
-     - Clonación del repositorio
-     - Instalación de dependencias
-     - Ejecución de tests
-     - Construcción y despliegue con Docker
+### Infraestructura Cloud
+- **AWS EC2**: Instancia t2.medium
 
-4. **Monitorización**
-   - Instalar PM2
-   - Ejecutar el script `monitor.sh` para monitorizar:
-     - Uso de CPU
-     - Uso de memoria
-     - Puertos activos
-     - Actualización cada 15 segundos
+### Monitorización y Logging
+- **PM2**: Gestor de procesos de Node.js
+- Monitorización en tiempo real
+
+### Herramientas de Gestión
+- **Miro**: Diseño y planificación visual
+- **Trello**: Gestión ágil del proyecto
+
+## 🚀 Guía de Configuración y Despliegue
+
+### 1. Configuración del Entorno AWS EC2
+
+#### Configuración de Seguridad
+- Abrir puerto 80 (HTTP)
+- Abrir puerto 443 (HTTPS)
+- Abrir puerto 8080 (Jenkins)
+
+### 2. Instalación y Configuración de Jenkins
+
+
+#### Jenkins Docker Compose
+```yaml
+version: '3.8'
+services:
+  jenkins:
+    image: jenkins/jenkins:lts
+    privileged: true
+    user: root
+    ports:
+      - "8080:8080"
+      - "50000:50000"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /usr/bin/docker:/usr/bin/docker
+    environment:
+      - DOCKER_HOST=unix:///var/run/docker.sock
+```
+
+#### Plugins Necesarios
+- Docker Pipeline
+- Docker
+
+### 3. Configuración del Pipeline
+
+#### Jenkinsfile
+```groovy
+pipeline {
+    agent any
+    environment {
+        DOCKER_COMPOSE_FILE = 'docker-compose.yml'  
+    }
+    stages {
+        stage('Checkout') {
+            steps {
+                git(
+                    url: 'https://github.com/fmartingv/Final_Automatizaci-n',
+                    credentialsId: 'github-access-token',
+                    branch: 'main'
+                )
+            }
+        }
+        stage('Install Dependencies') {
+            steps {
+                sh 'npm install'
+            }
+        }
+        stage('Run Tests') {
+            steps {
+                sh 'npm test'
+            }
+        }
+        stage('Build Docker Image') {
+            steps {
+                sh 'docker build -t players-app .'
+            }
+        }
+        stage('Deploy') {
+            steps {
+                script {
+                    // Despliega usando solo el docker-compose del proyecto
+                    sh 'docker-compose up -d --build'
+                    // Verificar despliegue
+                    sh 'docker-compose ps'
+                }
+            }
+        }
+    }
+    post {
+        success {
+            echo 'Pipeline completado con éxito'
+        }
+        failure {
+            echo 'Pipeline falló'
+            script {
+                sh 'docker-compose logs'
+                sh 'docker-compose down'
+            }
+        }
+        always {
+            cleanWs()
+        }
+    }
+}
+```
+
+### 4. Sistema de Monitorización
+
+#### Script de Monitorización (monitor.sh)
+```bash
+#!/bin/bash
+CONTAINER_NAME="pipeline_app_1"
+CONTAINER_PORT=3000
+while true; do
+  # Más información del contenedor
+  CONTAINER_STATUS=$(docker ps -f name=$CONTAINER_NAME --format '{{.Status}}')
+  CONTAINER_CPU=$(docker stats --no-stream $CONTAINER_NAME --format "{{.CPUPerc}}")
+  CONTAINER_MEM=$(docker stats --no-stream $CONTAINER_NAME --format "{{.MemUsage}}")
+  
+  # Verificar puerto
+  PORT_STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:$CONTAINER_PORT || echo "failed")
+  
+  # Log más detallado
+  echo "----------------------------------------"
+  echo "$(date)"
+  echo "Container Name: $CONTAINER_NAME"
+  echo "Status: $CONTAINER_STATUS"
+  echo "CPU Usage: $CONTAINER_CPU"
+  echo "Memory Usage: $CONTAINER_MEM"
+  echo "Port $CONTAINER_PORT Status: $PORT_STATUS"
+  echo "----------------------------------------" >> /home/ec2-user/app_metrics.log
+  
+  sleep 10
+done
+```
 
 ## 📈 Gestión del Proyecto
 - **Miro**: Utilizado para el diseño y planificación del proyecto, incluyendo diferentes iteraciones del diseño.
@@ -60,11 +179,3 @@ La aplicación incluye pruebas para todas las operaciones CRUD:
 
 ## 📹 Demostración
 Se incluye un video de 5 minutos que muestra el proceso completo de despliegue utilizando Jenkins.
-
-## 📝 Notas Adicionales
-- La aplicación está completamente containerizada usando Docker
-- El sistema de CI/CD está automatizado a través de Jenkins
-- La monitorización en tiempo real está implementada con PM2
-
----
-Para más detalles sobre la implementación o consultas, por favor revisa el código fuente o abre un issue en el repositorio.
