@@ -4,7 +4,7 @@
 Aplicación CRUD que permite gestionar una lista de jugadores de fútbol. La aplicación está desplegada en AWS y utiliza Jenkins para la integración continua y despliegue continuo (CI/CD).
 
 ## 🛠️ Tecnologías Utilizadas
-- Frontend: HTML, CSS, JavaScript
+- Frontend: HTML, CSS, JavaScript, NodeJS
 - Base de datos: JSON
 - Contenedorización: Docker
 - CI/CD: Jenkins
