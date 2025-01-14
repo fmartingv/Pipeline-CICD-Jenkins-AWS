@@ -1,13 +1,76 @@
-Documentación
-En esta documentación voy a tanto comentar los pasos que hay que hacer para que funcione el código como repasar las diferentes tecnologías utilizadas en el proceso:
-Lo primero será tener nuestro código de la aplicación CRUD, en mi caso cree una app sencilla de futbol la cual puedes añadir y eliminar jugadores, para esta app use las tecnologías de HTML, CSS, JS y JSON para guardar los datos. Una vez esta lista lo subimos a GitHub como indica las instrucciones.
-En este caso al ser un despliegue en la nube deberemos tener en nuestra cuenta de un servicio cloud lista para hacer algún despliegue, en mi caso fue AWS, donde crearemos un ec2 donde se ejecutará nuestro código.
-Una vez tengamos nuestra cuenta en ella crearemos un ec2(en mi caso no use el servicio gratuito de t2.micro ya que el Jenkins requerirá mas así que use t2.medium) donde una vez la conectemos con nuestra terminal ahí descargaremos lo necesario para poder usar Docker. Una vez lo tengamos como en nuestro caso usamos Jenkins pues crearemos un archivo Jenkins-compose.yml como tengo en mi GitHub donde este nos creara el Jenkins para ejecutar el código.
-A la vez que esto para en un futuro usar la monitorización tendremos que dentro instalar pm2 para así utilizarlo, en nuestra terminal crearemos el archivo monitor.sh el cual nos dará la información de nuestra app en un futuro como memoria, CPU, puertos… todo cada 15 segundos de manera infinita hasta que paremos.
-Una vez este Jenkins este funcione y estemos dentro (ya que en nuestra ec2 antes pusimos los puertos que utiliza para así poder entrar desde nuestra consola ya que le dimos permisos de entrar con http) ahí crearemos nuestro pipeline donde añadiremos el código del jenkinsfile que está en mi repositorio. Para que funcione tendremos que añadir los plugins que nos trae Jenkins de Docker pipeline y Docker para asegurarnos que funcionan los comandos que añadimos.
-Una vez este todo listo solo tendremos que ejecutar el pipeline para que este ejecute nuestro ciclo CI/CD completo donde empezará cogiendo el ultimo commit de nuestro GitHub (para esto tendremos que darle a nuestro Jenkins unas credenciales de GitHub) para instalar npm, ejecutar los diferentes test que tiene nuestra app CRUD como añadir un jugador, editarlo y poder eliminarlo además de llamar a la lista de jugadores para ver que funciona el JSON. Y por último hará con los archivos el Docker compose up para así levantar la aplicación.
+# Aplicación CRUD de Fútbol - Documentación 
 
+## 📋 Descripción
+Aplicación CRUD (Create, Read, Update, Delete) que permite gestionar una lista de jugadores de fútbol. La aplicación está desplegada en AWS y utiliza Jenkins para la integración continua y despliegue continuo (CI/CD).
 
-Ahora mismo deberíamos tener la app levantada en nuestro ec2 por lo que cualquier persona podrá acceder y ahí podemos ver que funciona. Ahora es el momento de ejecutar el comando del pm2 para comenzar la monitorización que comente antes y así podemos ver que recursos estamos utilizando todo el rato.
-También me gustaría comentar las aplicaciones que use para el plan de este proyecto que eran Miro y Trello donde gracias a Miro cree diferentes versiones hasta quedarme con la final de como sería el proyecto, y en Trello además de cerra historias de usuario para estes test y saber que quería hacer fui añadiendo las tareas que tenía que hacer para ayudarme a la organización.
-Casi todo esto que está aquí comentado se ve reflejado cómo funciona en el vídeo de 5 minutos donde ya desde el Jenkins fui ejecutando todo lo necesario para el despliegue de la app.
+## 🛠️ Tecnologías Utilizadas
+- Frontend: HTML, CSS, JavaScript
+- Base de datos: JSON
+- Contenedorización: Docker
+- CI/CD: Jenkins
+- Cloud: AWS EC2
+- Monitorización: PM2
+- Gestión de proyecto: Miro, Trello
+
+## 🚀 Configuración y Despliegue
+
+### Prerequisitos
+- Cuenta de AWS
+- Instancia EC2 t2.medium
+- Docker instalado
+- Node.js y npm
+
+### Pasos para el Despliegue
+
+1. **Configuración de AWS EC2**
+   - Crear una instancia EC2 t2.medium
+   - Configurar los grupos de seguridad para permitir tráfico HTTP
+   - Conectar a la instancia vía SSH
+
+2. **Configuración de Jenkins**
+   - Utilizar el archivo `jenkins-compose.yml` proporcionado en el repositorio
+   - Instalar los plugins necesarios:
+     - Docker Pipeline
+     - Docker
+
+3. **Configuración del Pipeline**
+   - Crear un nuevo pipeline en Jenkins
+   - Configurar las credenciales de GitHub
+   - Utilizar el Jenkinsfile del repositorio que incluye:
+     - Clonación del repositorio
+     - Instalación de dependencias
+     - Ejecución de tests
+     - Construcción y despliegue con Docker
+
+4. **Monitorización**
+   - Instalar PM2
+   - Ejecutar el script `monitor.sh` para monitorizar:
+     - Uso de CPU
+     - Uso de memoria
+     - Puertos activos
+     - Actualización cada 15 segundos
+
+## 📈 Gestión del Proyecto
+- **Miro**: Utilizado para el diseño y planificación del proyecto, incluyendo diferentes iteraciones del diseño.
+- **Trello**: Gestión de tareas e historias de usuario, incluyendo:
+  - Seguimiento de tests
+  - Organización de tareas
+  - Historias de usuario
+
+## 🧪 Testing
+La aplicación incluye pruebas para todas las operaciones CRUD:
+- Añadir jugador
+- Editar jugador
+- Eliminar jugador
+- Listar jugadores
+
+## 📹 Demostración
+Se incluye un video de 5 minutos que muestra el proceso completo de despliegue utilizando Jenkins.
+
+## 📝 Notas Adicionales
+- La aplicación está completamente containerizada usando Docker
+- El sistema de CI/CD está automatizado a través de Jenkins
+- La monitorización en tiempo real está implementada con PM2
+
+---
+Para más detalles sobre la implementación o consultas, por favor revisa el código fuente o abre un issue en el repositorio.
