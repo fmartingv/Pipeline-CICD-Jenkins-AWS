@@ -39,6 +39,8 @@ Esta aplicación es una solución CRUD (Create, Read, Update, Delete) diseñada 
 
 ### 1. Configuración del Entorno AWS EC2
 
+Crearemos una instancia m2.medium porqu ela t2.micro puede que se nos quede corta a la hora de eejcutar el pipeline en jenkins
+
 #### Configuración de Seguridad
 - Abrir puerto 80 (HTTP)
 - Abrir puerto 443 (HTTPS)
