@@ -3,14 +3,13 @@
 ## 📋 Descripción General del Proyecto
 Esta aplicación es una solución CRUD (Create, Read, Update, Delete) diseñada específicamente para la gestión de jugadores de fútbol. El sistema está completamente desplegado en la infraestructura de Amazon Web Services (AWS) y utiliza Jenkins como herramienta principal para implementar prácticas modernas de integración continua y despliegue continuo (CI/CD).
 
-## 🛠️ Stack Tecnológico Detallado
+## 🛠️ Tecnologías Utilizadas
 
 ### Frontend
 - **HTML**: Estructura semántica moderna
 - **CSS**: Estilos responsivos y adaptables
 - **JavaScript**: Interactividad del lado del cliente
 - **Node.js**: Runtime de JavaScript para el servidor
-- **Express.js**: Framework web para Node.js
 
 ### Almacenamiento de Datos
 - **JSON**: Almacenamiento de datos ligero y flexible
