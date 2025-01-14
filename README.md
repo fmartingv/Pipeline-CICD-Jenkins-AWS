@@ -107,9 +107,7 @@ pipeline {
         stage('Deploy') {
             steps {
                 script {
-                    // Despliega usando solo el docker-compose del proyecto
                     sh 'docker-compose up -d --build'
-                    // Verificar despliegue
                     sh 'docker-compose ps'
                 }
             }
