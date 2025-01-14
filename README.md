@@ -1,7 +1,7 @@
-# Aplicación CRUD de Fútbol - Documentación 
+# Documentación 
 
 ## 📋 Descripción
-Aplicación CRUD (Create, Read, Update, Delete) que permite gestionar una lista de jugadores de fútbol. La aplicación está desplegada en AWS y utiliza Jenkins para la integración continua y despliegue continuo (CI/CD).
+Aplicación CRUD que permite gestionar una lista de jugadores de fútbol. La aplicación está desplegada en AWS y utiliza Jenkins para la integración continua y despliegue continuo (CI/CD).
 
 ## 🛠️ Tecnologías Utilizadas
 - Frontend: HTML, CSS, JavaScript
@@ -13,12 +13,6 @@ Aplicación CRUD (Create, Read, Update, Delete) que permite gestionar una lista 
 - Gestión de proyecto: Miro, Trello
 
 ## 🚀 Configuración y Despliegue
-
-### Prerequisitos
-- Cuenta de AWS
-- Instancia EC2 t2.medium
-- Docker instalado
-- Node.js y npm
 
 ### Pasos para el Despliegue
 
